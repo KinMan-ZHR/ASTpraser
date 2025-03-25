@@ -1,0 +1,39 @@
+stages:
+  - build
+  - test
+  - lint
+
+build:
+  stage: build
+  image: node:16
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 day
+
+test:
+  stage: test
+  image: node:16
+  script:
+    - npm install
+    - npm test
+  dependencies:
+    - build
+
+code-check:
+  stage: lint
+  image: node:16
+  script:
+    - npm install
+    - npm run build
+    - npm run check -- ./test
+    - echo "检测报告生成完成"
+  artifacts:
+    paths:
+      - code-check-report.txt
+  dependencies:
+    - build
+  allow_failure: true  # 允许检测失败但不阻止流水线 
